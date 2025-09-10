@@ -1,16 +1,19 @@
-## Hi there 👋
+## Hello fellow coders! 👾
 
-<!--
-**sharky-3/sharky-3** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+Self tought programmer in both front-end and back-end. <br>
+```bash
+let dev_log = {
+  pronouns: ['He', 'Him'], // Using let > const, because life is mutable 😎
+  code: 'From front-end to back-end (Python, C#, C, JavaScript, Lua, HTML & CSS...)',
+  interest: ['Coding', 'Biking', 'Hiking', 'Cooking'],
+  career: ['Currently in school']
+}; // let > const, because life is mutable
+```
 
-Here are some ideas to get you started:
+---
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+## Tech & Development Skills
+<p align="left"> <a href="https://skillicons.dev"> <img src="https://skillicons.dev/icons?i=php,java,nodejs,py,flask,c,cpp,c#" /> </a> </p>
+<p align="left"> <a href="https://skillicons.dev"> <img src="https://skillicons.dev/icons?i=js,react,nextjs,tailwind,html,css" /> </a> </p>
+<p align="left"> <a href="https://skillicons.dev"> <img src="https://skillicons.dev/icons?i=mongodb,mysql" /> </a> </p>
+<p align="left"> <a href="https://skillicons.dev"> <img src="https://skillicons.dev/icons?i=git,github,docker,figma,vscode" /> </a> </p>
