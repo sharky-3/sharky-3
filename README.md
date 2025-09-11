@@ -4,11 +4,11 @@ Self tought programmer in both front-end and back-end. <br>
 > This is new account becouse my old one *sharky-2* got flagged for no reason :(
 ```bash
 let dev_log = {
-  pronouns: ['He', 'Him'], // Using let > const, because life is mutable 😎
+  pronouns: ['He', 'Him'],
   code: 'From front-end to back-end (Python, C#, C, JavaScript, Lua, HTML & CSS...)',
   interest: ['Coding', 'Biking', 'Hiking', 'Cooking'],
   career: ['Currently in school']
-}; // let > const, because life is mutable
+}; // let > const, because life is mutable 😎
 ```
 
 ---
