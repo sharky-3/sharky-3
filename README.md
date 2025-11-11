@@ -1,6 +1,6 @@
 ## Hello fellow coders! 👾
 
-Self tought programmer in both front-end and back-end. <br>
+Self thought programmer in both front-end and back-end. <br>
 > This is new account becouse my old one *sharky-2* got flagged for no reason :(
 ```bash
 let dev_log = {
