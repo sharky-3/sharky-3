@@ -5,7 +5,7 @@ Self thought programmer in both front-end and back-end. <br>
 ```bash
 let dev_log = {
   pronouns: ['He', 'Him'],
-  code: 'From front-end to back-end (Python, C#, C, JavaScript, Lua, HTML & CSS...)',
+  code: 'From front-end to back-end (Python, C#, C, JavaScript, C++, Lua, HTML & CSS, GDScript, PHP...)',
   interest: ['Coding', 'MTB', 'Hiking', 'Cooking'],
   career: ['Currently in school']
 }; // let > const, because life is mutable 😎
