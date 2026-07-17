@@ -1,15 +1,33 @@
-## Hello fellow coders! 👾
+## Hey, fellow coders! 👾
 
-Self thought programmer in both front-end and back-end. <br>
-> This is new account becouse my old one *sharky-2* got flagged for no reason :(
-```bash
+Self-taught developer exploring both **front-end** and **back-end** development.
+
+```js
 let dev_log = {
   pronouns: ['He', 'Him'],
-  code: 'From front-end to back-end (Python, C#, C, JavaScript, C++, Lua, HTML & CSS, GDScript, PHP...)',
-  interest: ['Coding', 'MTB', 'Hiking', 'Cooking'],
-  career: ['Currently in school']
-}; // let > const, because life is mutable 😎
-```
+  role: 'Full-stack developer in progress',
+  languages: [
+    'Python',
+    'C#',
+    'C',
+    'C++',
+    'JavaScript',
+    'Lua',
+    'PHP',
+    'GDScript',
+    'HTML',
+    'CSS'
+  ],
+  interests: [
+    'Building things with code',
+    'Mountain biking 🚵',
+    'Hiking 🥾',
+    'Cooking 🍳'
+  ],
+  current_status: 'Currently studying and leveling up 🚀'
+};
+
+// let > const, because growth means change 😎
 
 ---
 
