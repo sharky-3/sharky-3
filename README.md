@@ -33,7 +33,5 @@ let dev_log = {
 ---
 
 ## Tech & Development Skills
-<p align="left"> <a href="https://skillicons.dev"> <img src="https://skillicons.dev/icons?i=php,java,nodejs,py,flask,c,cpp,c#,swift" /> </a> </p>
-<p align="left"> <a href="https://skillicons.dev"> <img src="https://skillicons.dev/icons?i=js,react,nextjs,tailwind,html,css" /> </a> </p>
-<p align="left"> <a href="https://skillicons.dev"> <img src="https://skillicons.dev/icons?i=mongodb,mysql" /> </a> </p>
-<p align="left"> <a href="https://skillicons.dev"> <img src="https://skillicons.dev/icons?i=git,github,docker,figma,vscode,xcode" /> </a> </p>
+<p align="left"> <a href="https://skillicons.dev"> <img src="https://skillicons.dev/icons?i=php,java,nodejs,py,flask,c,cpp,c#" /> </a> </p>
+<p align="left"> <a href="https://skillicons.dev"> <img src="https://skillicons.dev/icons?i=js,react,tailwind,html,css,swift" /> </a> </p>
