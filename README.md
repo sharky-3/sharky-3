@@ -1,2 +1,2 @@
 <img align="left" alt="github stats" src="https://github-stats-extended.vercel.app/api?username=sharky-3">
-![GitHub Stats](https://github-stats-extended.vercel.app/api?username=YOUR_USERNAME&hide=prs,issues,contribs)
+<img src="https://github-stats-extended.vercel.app/api?username=sharky-3&hide=prs,issues,contribs" alt="GitHub Stats" />
