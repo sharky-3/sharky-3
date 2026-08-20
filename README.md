@@ -4,7 +4,6 @@ Self-taught developer exploring both **front-end** and **back-end** development.
 
 ```js
 let dev_log = {
-  // blaž@kolarič ------------------------------------------------------------------------
   Pronouns: ['He', 'Him'],
   OS: 'Macbook pro M5',
   Uptime: '19 years',
