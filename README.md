@@ -10,7 +10,7 @@ let dev_log = {
   Uptime: '19 years',
   IDE: ['VScode', 'Xcode'],
 
-  Languages_programming: ['Python', 'C#', 'JavaScript','Luau', 'PHP', 'GDScript', 'Swift'],
+  Programming_languages: ['Python', 'C#', 'JavaScript','Luau', 'PHP', 'GDScript', 'Swift'],
   Markup_and_data: ['HTML', 'CSS', 'JSON'],
   
   Interests: ['Building things with code', 'Mountain biking', 'Hiking', 'Cooking']
