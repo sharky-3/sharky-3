@@ -13,51 +13,86 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout README
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Get GitHub statistics
+      - name: Calculate lifetime GitHub stats
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python3 <<'PY'
           import json
-          import urllib.request
-          import urllib.parse
           import os
           import re
+          import time
+          import urllib.request
+          import urllib.error
 
           USERNAME = "sharky-3"
+          TOKEN = os.environ["GH_TOKEN"]
 
-          headers = {
+          HEADERS = {
               "Accept": "application/vnd.github+json",
-              "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
+              "Authorization": f"Bearer {TOKEN}",
               "X-GitHub-Api-Version": "2026-03-10",
-              "User-Agent": "github-stats-updater"
+              "User-Agent": "github-stats"
           }
 
           def api(url):
-              req = urllib.request.Request(url, headers=headers)
-              with urllib.request.urlopen(req) as response:
-                  return json.loads(response.read())
+              for attempt in range(10):
+                  try:
+                      request = urllib.request.Request(
+                          url,
+                          headers=HEADERS
+                      )
 
-          # ---------------------------------------------------------
-          # User information
-          # ---------------------------------------------------------
+                      with urllib.request.urlopen(request) as response:
 
-          user = api(f"https://api.github.com/users/{USERNAME}")
+                          # GitHub is still calculating statistics.
+                          if response.status == 202:
+                              print("GitHub is calculating statistics...")
+                              time.sleep(10)
+                              continue
+
+                          return json.loads(response.read())
+
+                  except urllib.error.HTTPError as e:
+
+                      if e.code == 202:
+                          print("GitHub returned 202. Waiting...")
+                          time.sleep(10)
+                          continue
+
+                      print(f"HTTP {e.code}: {url}")
+                      return None
+
+              print(f"Failed after retries: {url}")
+              return None
+
+
+          # ==========================================================
+          # USER
+          # ==========================================================
+
+          user = api(
+              f"https://api.github.com/users/{USERNAME}"
+          )
+
+          if not user:
+              raise Exception("Could not get user information.")
 
           followers = user["followers"]
 
-          # ---------------------------------------------------------
-          # Repositories
-          # ---------------------------------------------------------
+
+          # ==========================================================
+          # REPOSITORIES
+          # ==========================================================
 
           repos = []
-
           page = 1
 
           while True:
+
               data = api(
                   f"https://api.github.com/users/{USERNAME}/repos"
                   f"?per_page=100&page={page}&type=owner"
@@ -73,13 +108,18 @@ jobs:
 
               page += 1
 
+
           repo_count = len(repos)
 
-          stars = sum(repo["stargazers_count"] for repo in repos)
+          stars = sum(
+              repo.get("stargazers_count", 0)
+              for repo in repos
+          )
 
-          # ---------------------------------------------------------
-          # Commits + additions + deletions
-          # ---------------------------------------------------------
+
+          # ==========================================================
+          # LIFETIME COMMITS / LOC
+          # ==========================================================
 
           total_commits = 0
           total_additions = 0
@@ -90,65 +130,122 @@ jobs:
               owner = repo["owner"]["login"]
               name = repo["name"]
 
-              try:
-                  contributors = api(
-                      f"https://api.github.com/repos/{owner}/{name}"
-                      f"/stats/contributors"
-                  )
+              print("")
+              print(f"Processing: {owner}/{name}")
 
-                  # GitHub may return 202 while calculating statistics.
-                  if not isinstance(contributors, list):
+              url = (
+                  f"https://api.github.com/repos/"
+                  f"{owner}/{name}/stats/contributors"
+              )
+
+              contributors = api(url)
+
+              if not contributors:
+                  print("No contributor statistics available.")
+                  continue
+
+              found = False
+
+              for contributor in contributors:
+
+                  author = contributor.get("author")
+
+                  if not author:
                       continue
 
-                  for contributor in contributors:
+                  login = author.get("login", "")
 
-                      if contributor.get("author") is None:
-                          continue
+                  if login.lower() != USERNAME.lower():
+                      continue
 
-                      if contributor["author"]["login"].lower() != USERNAME.lower():
-                          continue
+                  found = True
 
-                      total_commits += contributor.get("total", 0)
+                  # Lifetime commit count for this repository.
+                  total_commits += contributor.get("total", 0)
 
-                      for week in contributor.get("weeks", []):
-                          total_additions += week.get("a", 0)
-                          total_deletions += week.get("d", 0)
+                  # Every week from the beginning of the
+                  # repository's available statistics.
+                  for week in contributor.get("weeks", []):
 
-              except Exception as e:
-                  print(f"Skipping {owner}/{name}: {e}")
+                      total_additions += week.get("a", 0)
+                      total_deletions += week.get("d", 0)
 
-          total_lines = total_additions - total_deletions
+                  break
 
-          # ---------------------------------------------------------
-          # Format numbers
-          # ---------------------------------------------------------
+              if not found:
+                  print("User is not listed as a contributor.")
+
+
+          # ==========================================================
+          # NET LINES
+          # ==========================================================
+
+          net_lines = (
+              total_additions -
+              total_deletions
+          )
+
+
+          # ==========================================================
+          # FORMAT
+          # ==========================================================
 
           def fmt(number):
               return f"{number:,}"
 
-          stats = f""". Repos: ............................... {fmt(repo_count)} | Stars: ........................... {fmt(stars)}
 
-          . Commits: ............................ {fmt(total_commits)} | Followers: ....................... {fmt(followers)}
+          stats = (
+              f". Repos: ............................... "
+              f"{fmt(repo_count)} | "
+              f"Stars: ........................... "
+              f"{fmt(stars)}\n\n"
 
-          . Lines of Code on GitHub: {fmt(total_lines)} ( {fmt(total_additions)}++, {fmt(total_deletions)}-- )"""
+              f". Commits: ............................ "
+              f"{fmt(total_commits)} | "
+              f"Followers: ....................... "
+              f"{fmt(followers)}\n\n"
 
-          # ---------------------------------------------------------
-          # Update README
-          # ---------------------------------------------------------
+              f". Lines of Code on GitHub: "
+              f"{fmt(net_lines)} "
+              f"( {fmt(total_additions)}++, "
+              f"{fmt(total_deletions)}-- )"
+          )
 
-          with open("README.md", "r", encoding="utf-8") as f:
-              readme = f.read()
+
+          print("")
+          print("========================================")
+          print("LIFETIME GITHUB STATS")
+          print("========================================")
+          print(stats)
+          print("========================================")
+
+
+          # ==========================================================
+          # UPDATE README
+          # ==========================================================
+
+          with open(
+              "README.md",
+              "r",
+              encoding="utf-8"
+          ) as file:
+
+              readme = file.read()
+
 
           pattern = (
-              r"<!-- GITHUB_STATS_START -->.*?"
+              r"<!-- GITHUB_STATS_START -->"
+              r".*?"
               r"<!-- GITHUB_STATS_END -->"
           )
 
+
           replacement = (
               "<!-- GITHUB_STATS_START -->\n"
-              + stats
-              + "\n<!-- GITHUB_STATS_END -->"
+              + stats +
+              "\n<!-- GITHUB_STATS_END -->"
           )
+
 
           new_readme = re.sub(
               pattern,
@@ -157,17 +254,27 @@ jobs:
               flags=re.DOTALL
           )
 
+
           if new_readme == readme:
-              print("No README changes.")
+
+              print("README is already up to date.")
+
           else:
-              with open("README.md", "w", encoding="utf-8") as f:
-                  f.write(new_readme)
+
+              with open(
+                  "README.md",
+                  "w",
+                  encoding="utf-8"
+              ) as file:
+
+                  file.write(new_readme)
 
               print("README updated.")
-              print(stats)
+
+
           PY
 
-      - name: Commit updated stats
+      - name: Commit updated README
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -175,7 +282,7 @@ jobs:
           git add README.md
 
           if git diff --cached --quiet; then
-            echo "No changes to commit."
+            echo "No changes."
           else
             git commit -m "chore: update GitHub stats"
             git push
