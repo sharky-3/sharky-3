@@ -38,6 +38,11 @@ jobs:
               "User-Agent": "github-stats"
           }
 
+
+          # ==========================================================
+          # GITHUB API
+          # ==========================================================
+
           def api(url):
               for attempt in range(10):
                   try:
@@ -48,25 +53,53 @@ jobs:
 
                       with urllib.request.urlopen(request) as response:
 
-                          # GitHub is still calculating statistics.
+                          # GitHub may return 202 while statistics
+                          # are still being generated.
                           if response.status == 202:
-                              print("GitHub is calculating statistics...")
+                              print(
+                                  "GitHub is calculating statistics..."
+                              )
                               time.sleep(10)
                               continue
 
-                          return json.loads(response.read())
+                          return json.loads(
+                              response.read().decode("utf-8")
+                          )
 
-                  except urllib.error.HTTPError as e:
+                  except urllib.error.HTTPError as error:
 
-                      if e.code == 202:
-                          print("GitHub returned 202. Waiting...")
+                      if error.code == 202:
+                          print(
+                              "GitHub returned 202. Waiting..."
+                          )
                           time.sleep(10)
                           continue
 
-                      print(f"HTTP {e.code}: {url}")
+                      print(
+                          f"HTTP {error.code}: {url}"
+                      )
+
+                      try:
+                          body = error.read().decode(
+                              "utf-8",
+                              errors="replace"
+                          )
+                          print(body)
+                      except Exception:
+                          pass
+
                       return None
 
-              print(f"Failed after retries: {url}")
+                  except urllib.error.URLError as error:
+                      print(
+                          f"Network error: {error}"
+                      )
+                      time.sleep(5)
+
+              print(
+                  f"Failed after retries: {url}"
+              )
+
               return None
 
 
@@ -74,21 +107,31 @@ jobs:
           # USER
           # ==========================================================
 
+          print("Fetching user information...")
+
           user = api(
               f"https://api.github.com/users/{USERNAME}"
           )
 
           if not user:
-              raise Exception("Could not get user information.")
+              raise Exception(
+                  "Could not get user information."
+              )
 
-          followers = user["followers"]
+          followers = user.get(
+              "followers",
+              0
+          )
 
 
           # ==========================================================
           # REPOSITORIES
           # ==========================================================
 
+          print("Fetching repositories...")
+
           repos = []
+
           page = 1
 
           while True:
@@ -98,8 +141,10 @@ jobs:
                   f"?per_page=100&page={page}&type=owner"
               )
 
-              if not data:
-                  break
+              if data is None:
+                  raise Exception(
+                      f"Could not retrieve repositories page {page}."
+                  )
 
               repos.extend(data)
 
@@ -109,29 +154,48 @@ jobs:
               page += 1
 
 
-          repo_count = len(repos)
+          # Only count repositories owned by the user.
+          # Forks are excluded.
+          original_repos = [
+              repo
+              for repo in repos
+              if not repo.get("fork", False)
+          ]
+
+          repo_count = len(original_repos)
+
+
+          # ==========================================================
+          # STARS
+          # ==========================================================
 
           stars = sum(
-              repo.get("stargazers_count", 0)
-              for repo in repos
+              repo.get(
+                  "stargazers_count",
+                  0
+              )
+              for repo in original_repos
           )
 
 
           # ==========================================================
-          # LIFETIME COMMITS / LOC
+          # COMMITS / ADDITIONS / DELETIONS
           # ==========================================================
 
           total_commits = 0
           total_additions = 0
           total_deletions = 0
 
-          for repo in repos:
+
+          for repo in original_repos:
 
               owner = repo["owner"]["login"]
               name = repo["name"]
 
               print("")
-              print(f"Processing: {owner}/{name}")
+              print(
+                  f"Processing: {owner}/{name}"
+              )
 
               url = (
                   f"https://api.github.com/repos/"
@@ -141,39 +205,72 @@ jobs:
               contributors = api(url)
 
               if not contributors:
-                  print("No contributor statistics available.")
+
+                  print(
+                      "No contributor statistics available."
+                  )
+
                   continue
+
 
               found = False
 
+
               for contributor in contributors:
 
-                  author = contributor.get("author")
+                  author = contributor.get(
+                      "author"
+                  )
 
                   if not author:
                       continue
 
-                  login = author.get("login", "")
+
+                  login = author.get(
+                      "login",
+                      ""
+                  )
+
 
                   if login.lower() != USERNAME.lower():
                       continue
 
+
                   found = True
 
-                  # Lifetime commit count for this repository.
-                  total_commits += contributor.get("total", 0)
 
-                  # Every week from the beginning of the
-                  # repository's available statistics.
-                  for week in contributor.get("weeks", []):
+                  # Total commits.
+                  total_commits += contributor.get(
+                      "total",
+                      0
+                  )
 
-                      total_additions += week.get("a", 0)
-                      total_deletions += week.get("d", 0)
+
+                  # Weekly additions/deletions.
+                  for week in contributor.get(
+                      "weeks",
+                      []
+                  ):
+
+                      total_additions += week.get(
+                          "a",
+                          0
+                      )
+
+                      total_deletions += week.get(
+                          "d",
+                          0
+                      )
+
 
                   break
 
+
               if not found:
-                  print("User is not listed as a contributor.")
+
+                  print(
+                      "User is not listed as a contributor."
+                  )
 
 
           # ==========================================================
@@ -187,42 +284,131 @@ jobs:
 
 
           # ==========================================================
-          # FORMAT
+          # NUMBER FORMAT
           # ==========================================================
 
           def fmt(number):
               return f"{number:,}"
 
 
+          # ==========================================================
+          # BUILD README OUTPUT
+          # ==========================================================
+
           stats = (
-              f". Repos: ............................... "
+              "```swift\n\n"
+
+              "kolarič@*blaž* "
+              "------------------------------------------------------------------ --\n\n"
+
+              ". OS: "
+              "............................................................. "
+              "Macbook pro M5\n\n"
+
+              ". Uptime: "
+              "............................................ "
+              "19 years, 5 months, 29 days\n\n"
+
+              ". Kernel: "
+              ".................................................................. "
+              "macOS\n\n"
+
+              ". IDE: "
+              "............................................................. "
+              "Cursor, Xcode\n\n"
+
+              ".\n\n"
+
+              ". Languages.Programming: "
+              "............... "
+              "Java, Python, JavaScript, C#, Swift, Luau\n\n"
+
+              ". Languages.Computer: "
+              "............................................ "
+              "HTML, CSS, JSON\n\n"
+
+              ". Languages.Real: "
+              "............................................. "
+              "English, Slovenian\n\n"
+
+              ".\n\n"
+
+              ". Hobbies.Software: "
+              ".................. "
+              "macOS App & Widget Dev, Reverse Engineering\n\n"
+
+              ". Hobbies.Web: "
+              "........................... "
+              "Web Scraping, Browser Extensions & Mods\n\n"
+
+              ". Hobbies.Gaming: "
+              "....................... "
+              "Game Automation, Modding & Interactivity\n\n"
+
+              "Contact "
+              "----------------------------------------------------------------------- --\n\n"
+
+              ". Discord: "
+              "............................................................ "
+              "sharky4160\n\n"
+
+              "Stats "
+              "------------------------------------------------------------------------- --\n\n"
+
+              f". Repos: "
+              f"............................... "
               f"{fmt(repo_count)} | "
-              f"Stars: ........................... "
+
+              f"Stars: "
+              f"........................... "
               f"{fmt(stars)}\n\n"
 
-              f". Commits: ............................ "
+              f". Commits: "
+              f"............................ "
               f"{fmt(total_commits)} | "
-              f"Followers: ....................... "
+
+              f"Followers: "
+              f"....................... "
               f"{fmt(followers)}\n\n"
 
               f". Lines of Code on GitHub: "
               f"{fmt(net_lines)} "
               f"( {fmt(total_additions)}++, "
-              f"{fmt(total_deletions)}-- )"
+              f"{fmt(total_deletions)}-- )\n\n"
+
+              "```"
           )
 
 
+          # ==========================================================
+          # PRINT STATS
+          # ==========================================================
+
           print("")
-          print("========================================")
-          print("LIFETIME GITHUB STATS")
-          print("========================================")
+          print(
+              "========================================"
+          )
+          print(
+              "LIFETIME GITHUB STATS"
+          )
+          print(
+              "========================================"
+          )
+
           print(stats)
-          print("========================================")
+
+          print(
+              "========================================"
+          )
 
 
           # ==========================================================
           # UPDATE README
           # ==========================================================
+
+          print("")
+          print("Updating README.md...")
+
 
           with open(
               "README.md",
@@ -233,31 +419,42 @@ jobs:
               readme = file.read()
 
 
-          pattern = (
+          pattern = re.compile(
               r"<!-- GITHUB_STATS_START -->"
               r".*?"
-              r"<!-- GITHUB_STATS_END -->"
+              r"<!-- GITHUB_STATS_END -->",
+              re.DOTALL
           )
 
 
           replacement = (
-              "<!-- GITHUB_STATS_START -->\n"
-              + stats +
-              "\n<!-- GITHUB_STATS_END -->"
+              "<!-- GITHUB_STATS_START -->\n\n"
+              f"{stats}\n\n"
+              "<!-- GITHUB_STATS_END -->"
           )
 
 
-          new_readme = re.sub(
-              pattern,
+          new_readme, replacements = pattern.subn(
               replacement,
               readme,
-              flags=re.DOTALL
+              count=1
           )
+
+
+          if replacements == 0:
+
+              raise Exception(
+                  "Could not find "
+                  "GITHUB_STATS_START/END markers "
+                  "in README.md."
+              )
 
 
           if new_readme == readme:
 
-              print("README is already up to date.")
+              print(
+                  "README is already up to date."
+              )
 
           else:
 
@@ -269,10 +466,64 @@ jobs:
 
                   file.write(new_readme)
 
-              print("README updated.")
+              print(
+                  "README updated."
+              )
 
+
+          # ==========================================================
+          # FINAL SUMMARY
+          # ==========================================================
+
+          print("")
+          print(
+              "========================================"
+          )
+          print(
+              "SUMMARY"
+          )
+          print(
+              "========================================"
+          )
+
+          print(
+              f"Repositories : {fmt(repo_count)}"
+          )
+
+          print(
+              f"Stars        : {fmt(stars)}"
+          )
+
+          print(
+              f"Commits      : {fmt(total_commits)}"
+          )
+
+          print(
+              f"Followers    : {fmt(followers)}"
+          )
+
+          print(
+              f"Additions    : {fmt(total_additions)}"
+          )
+
+          print(
+              f"Deletions    : {fmt(total_deletions)}"
+          )
+
+          print(
+              f"Net LOC      : {fmt(net_lines)}"
+          )
+
+          print(
+              "========================================"
+          )
 
           PY
+
+
+      # ============================================================
+      # COMMIT README
+      # ============================================================
 
       - name: Commit updated README
         run: |
