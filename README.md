@@ -1,45 +1,37 @@
-*<!-- GITHUB_STATS_START -->
+## Hey, fellow coders! 👾
 
-```swift
+Self-taught developer exploring both **front-end** and **back-end** development.
 
-kolarič@*blaž* ------------------------------------------------------------------ --
+```js
+let dev_log = {
+  pronouns: ['He', 'Him'],
+  role: 'Full-stack developer in progress',
+  languages: [
+    'Python',
+    'C#',
+    'C',
+    'C++',
+    'JavaScript',
+    'Lua',
+    'PHP',
+    'GDScript',
+    'HTML',
+    'CSS'
+  ],
+  interests: [
+    'Building things with code',
+    'Mountain biking 🚵',
+    'Hiking 🥾',
+    'Cooking 🍳'
+  ],
+  current_status: 'Currently studying and leveling up 🚀'
+};
 
-. OS: ............................................................. Macbook pro M5
-
-. Uptime: ............................................ 19 years, 5 months, 29 days
-
-. Kernel: .................................................................. macOS
-
-. IDE: ............................................................. Cursor, Xcode
-
-.
-
-. Languages.Programming: ............... Java, Python, JavaScript, C#, Swift, Luau
-
-. Languages.Computer: ............................................ HTML, CSS, JSON
-
-. Languages.Real: ............................................. English, Slovenian
-
-.
-
-. Hobbies.Software: .................. macOS App & Widget Dev, Reverse Engineering
-
-. Hobbies.Web: ........................... Web Scraping, Browser Extensions & Mods
-
-. Hobbies.Gaming: ....................... Game Automation, Modding & Interactivity
-
-Contact ----------------------------------------------------------------------- --
-
-. Discord: ............................................................ sharky4160
-
-Stats ------------------------------------------------------------------------- --
-
-. Repos: ............................... 16 | Stars: ........................... 0
-
-. Commits: ............................ 499 | Followers: ....................... 2
-
-. Lines of Code on GitHub: 60,196 ( 65,413++, 5,217-- )
-
+// let > const, because growth means change 😎
 ```
 
-<!-- GITHUB_STATS_END -->*
+---
+
+## Tech & Development Skills
+<p align="left"> <a href="https://skillicons.dev"> <img src="https://skillicons.dev/icons?i=php,java,nodejs,py,flask,c,cpp,c#" /> </a> </p>
+<p align="left"> <a href="https://skillicons.dev"> <img src="https://skillicons.dev/icons?i=js,react,tailwind,html,css,swift" /> </a> </p>
