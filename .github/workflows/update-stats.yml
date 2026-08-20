@@ -1,0 +1,182 @@
+name: Update GitHub Stats
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout README
+        uses: actions/checkout@v4
+
+      - name: Get GitHub statistics
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 <<'PY'
+          import json
+          import urllib.request
+          import urllib.parse
+          import os
+          import re
+
+          USERNAME = "sharky-3"
+
+          headers = {
+              "Accept": "application/vnd.github+json",
+              "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
+              "X-GitHub-Api-Version": "2026-03-10",
+              "User-Agent": "github-stats-updater"
+          }
+
+          def api(url):
+              req = urllib.request.Request(url, headers=headers)
+              with urllib.request.urlopen(req) as response:
+                  return json.loads(response.read())
+
+          # ---------------------------------------------------------
+          # User information
+          # ---------------------------------------------------------
+
+          user = api(f"https://api.github.com/users/{USERNAME}")
+
+          followers = user["followers"]
+
+          # ---------------------------------------------------------
+          # Repositories
+          # ---------------------------------------------------------
+
+          repos = []
+
+          page = 1
+
+          while True:
+              data = api(
+                  f"https://api.github.com/users/{USERNAME}/repos"
+                  f"?per_page=100&page={page}&type=owner"
+              )
+
+              if not data:
+                  break
+
+              repos.extend(data)
+
+              if len(data) < 100:
+                  break
+
+              page += 1
+
+          repo_count = len(repos)
+
+          stars = sum(repo["stargazers_count"] for repo in repos)
+
+          # ---------------------------------------------------------
+          # Commits + additions + deletions
+          # ---------------------------------------------------------
+
+          total_commits = 0
+          total_additions = 0
+          total_deletions = 0
+
+          for repo in repos:
+
+              owner = repo["owner"]["login"]
+              name = repo["name"]
+
+              try:
+                  contributors = api(
+                      f"https://api.github.com/repos/{owner}/{name}"
+                      f"/stats/contributors"
+                  )
+
+                  # GitHub may return 202 while calculating statistics.
+                  if not isinstance(contributors, list):
+                      continue
+
+                  for contributor in contributors:
+
+                      if contributor.get("author") is None:
+                          continue
+
+                      if contributor["author"]["login"].lower() != USERNAME.lower():
+                          continue
+
+                      total_commits += contributor.get("total", 0)
+
+                      for week in contributor.get("weeks", []):
+                          total_additions += week.get("a", 0)
+                          total_deletions += week.get("d", 0)
+
+              except Exception as e:
+                  print(f"Skipping {owner}/{name}: {e}")
+
+          total_lines = total_additions - total_deletions
+
+          # ---------------------------------------------------------
+          # Format numbers
+          # ---------------------------------------------------------
+
+          def fmt(number):
+              return f"{number:,}"
+
+          stats = f""". Repos: ............................... {fmt(repo_count)} | Stars: ........................... {fmt(stars)}
+
+          . Commits: ............................ {fmt(total_commits)} | Followers: ....................... {fmt(followers)}
+
+          . Lines of Code on GitHub: {fmt(total_lines)} ( {fmt(total_additions)}++, {fmt(total_deletions)}-- )"""
+
+          # ---------------------------------------------------------
+          # Update README
+          # ---------------------------------------------------------
+
+          with open("README.md", "r", encoding="utf-8") as f:
+              readme = f.read()
+
+          pattern = (
+              r"<!-- GITHUB_STATS_START -->.*?"
+              r"<!-- GITHUB_STATS_END -->"
+          )
+
+          replacement = (
+              "<!-- GITHUB_STATS_START -->\n"
+              + stats
+              + "\n<!-- GITHUB_STATS_END -->"
+          )
+
+          new_readme = re.sub(
+              pattern,
+              replacement,
+              readme,
+              flags=re.DOTALL
+          )
+
+          if new_readme == readme:
+              print("No README changes.")
+          else:
+              with open("README.md", "w", encoding="utf-8") as f:
+                  f.write(new_readme)
+
+              print("README updated.")
+              print(stats)
+          PY
+
+      - name: Commit updated stats
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add README.md
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: update GitHub stats"
+            git push
+          fi

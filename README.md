@@ -1,6 +1,9 @@
-<img align="left" alt="github stats" src="https://github-stats-extended.vercel.app/api?username=sharky-3">
-<img src="https://github-stats-extended.vercel.app/api?username=sharky-3&hide=prs,issues,contribs" alt="GitHub Stats" />
-<img
-  src="https://github-stats-extended.vercel.app/api?shakry-3=octocat&show_icons=true"
-  alt="GitHub Stats"
-/>
+- GitHub Stats -------------------------------------------------------------- -- -
+
+<!-- GITHUB_STATS_START -->
+. Repos: ............................... 0 | Stars: ........................... 0
+
+. Commits: ............................ 0 | Followers: ....................... 0
+
+. Lines of Code on GitHub: 0 ( 0++, 0-- )
+<!-- GITHUB_STATS_END -->
