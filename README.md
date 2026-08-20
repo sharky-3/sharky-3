@@ -4,34 +4,15 @@ Self-taught developer exploring both **front-end** and **back-end** development.
 
 ```js
 let dev_log = {
-  pronouns: ['He', 'Him'],
-  role: 'Full-stack developer in progress',
-  languages: [
-    'Python',
-    'C#',
-    'C',
-    'C++',
-    'JavaScript',
-    'Lua',
-    'PHP',
-    'GDScript',
-    'HTML',
-    'CSS'
-  ],
-  interests: [
-    'Building things with code',
-    'Mountain biking 🚵',
-    'Hiking 🥾',
-    'Cooking 🍳'
-  ],
-  current_status: 'Currently studying and leveling up 🚀'
+  // blaž@kolarič ------------------------------------------------------------------------
+  Pronouns: ['He', 'Him'],
+  OS: 'Macbook pro M5',
+  Uptime: '19 years',
+  IDE: ['VScode', 'Xcode'],
+
+  Languages_programming: ['Python', 'C#', 'JavaScript','Luau', 'PHP', 'GDScript', 'Swift'],
+  Languages_computer: ['HTML', 'CSS', 'JSON'],
+  
+  Interests: ['Building things with code', 'Mountain biking', 'Hiking', 'Cooking']
 };
-
-// let > const, because growth means change 😎
 ```
-
----
-
-## Tech & Development Skills
-<p align="left"> <a href="https://skillicons.dev"> <img src="https://skillicons.dev/icons?i=php,java,nodejs,py,flask,c,cpp,c#" /> </a> </p>
-<p align="left"> <a href="https://skillicons.dev"> <img src="https://skillicons.dev/icons?i=js,react,tailwind,html,css,swift" /> </a> </p>
