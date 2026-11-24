@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="BestApps.png" width="128" alt="Kin icon">
+</p>
 
 ```js
 let dev_log = {
