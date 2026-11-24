@@ -1,6 +1,7 @@
-<p align="center">
-  <img src="BestApps.png" width="128" alt="Kin icon">
-</p>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./header-dark.png">
+  <img src="./header-light.png" alt="My apps" width="100%">
+</picture>
 
 ```js
 let dev_log = {
