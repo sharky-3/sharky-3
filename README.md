@@ -1,6 +1,7 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./header-dark.png">
-  <img src="./header-light.png" alt="My apps" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sharky-3/sharky-3/main/header-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/sharky-3/sharky-3/main/header-light.png">
+  <img src="https://raw.githubusercontent.com/sharky-3/sharky-3/main/header-light.png" alt="My apps" width="100%">
 </picture>
 
 ```js
