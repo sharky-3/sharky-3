@@ -1,5 +1,5 @@
-![My apps](https://raw.githubusercontent.com/sharky-3/sharky-3/main/header-light.png#gh-light-mode-only)
-![My apps](https://raw.githubusercontent.com/sharky-3/sharky-3/main/header-dark.png#gh-dark-mode-only)
+![My apps](https://raw.githubusercontent.com/sharky-3/sharky-3/main/header-light.png?v=2#gh-light-mode-only)
+![My apps](https://raw.githubusercontent.com/sharky-3/sharky-3/main/header-dark.png?v=2#gh-dark-mode-only)
 
 ```js
 let dev_log = {
