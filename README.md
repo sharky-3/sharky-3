@@ -1,8 +1,5 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sharky-3/sharky-3/main/header-dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/sharky-3/sharky-3/main/header-light.png">
-  <img src="https://raw.githubusercontent.com/sharky-3/sharky-3/main/header-light.png" alt="My apps" width="100%">
-</picture>
+![My apps](https://raw.githubusercontent.com/sharky-3/sharky-3/main/header-light.png#gh-light-mode-only)
+![My apps](https://raw.githubusercontent.com/sharky-3/sharky-3/main/header-dark.png#gh-dark-mode-only)
 
 ```js
 let dev_log = {
